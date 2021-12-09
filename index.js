@@ -1,48 +1,35 @@
 import express from "express";
-import models from "./models/index.js";
-import mongoose from 'mongoose';
+import connectWithDb from "./mongo";
+import configure from "./controllers";
+
 const port = 4500;
 const app = express();
  
 // middleware
 app.use(express.json());
 
-const log = msg => console.log(msg);
-
-// connect mongoDB
-const uri = `mongodb://root:PASSWORD@localhost:27017/malkoi?authSource=admin`
-const options = {};
-const connectWithDb = ()=>{
-    mongoose.connect(uri, options, (error, db)=>{
-        if(error){
-            console.log(error);
-            console.log("Database connection faill.");
-        }
-        else{
-            log("Database connection successful.");
-        }
-    });
-};
-
+// Connect with MongoDB.
 connectWithDb()
 
-// create api or url
-app.post('/', (req, res)=>{
-    // console.log(req)
-    const body = req.body;
-    // console.log(body);
-    const user = new models.User({username:body.username, createdAt:new Date()})
-    user.save().then(savedUser=>{
-        res.status(201).send("user saved id "+savedUser._id);
-    })
-    .catch((error)=>{
-        console.log(error);
-        res.status(500).send("failed to saved")
-    })
-})
+configure(app);
 
 app.listen(port, ()=>{
     console.log('listening port ', port);
 })
 
-log(models)
+
+/*
+1. up and running the express server
+2. configure the express server.
+3. handle the routes of the server
+
+- use directory import
+- use async await function
+
+
+- 3 layers architecture
+    = controler layer: process the http request
+    = service layer: process the object and send it to data lalyer.
+    = data layer: process the data and get/set it to the database.
+
+*/
